@@ -8,13 +8,27 @@ from werkzeug.exceptions import MethodNotAllowed, NotFound, BadRequest
 app_views = Blueprint('app_views', __name__, url_prefix='/api/v1')
 
 
+def remove_keys(_dict, keys):
+    ''' remove keys for dictionary if they exist '''
+    for key in keys:
+        if key in _dict.keys():
+            del _dict[key]
+
+    return _dict
+
+
 def validate_data(data, key="name", includeKey=True):
     ''' ensures json_data is valid '''
     if type(data) is not dict:
         raise BadRequest(description='Not a JSON')
 
-    if key not in data and includeName:
+    if type(key) is str and key not in data and includeKey:
         raise BadRequest(description="Missing {}".format(key))
+
+    if type(key) is list and len(key) and includeKey:
+        for k in key:
+            if k not in data:
+                raise BadRequest(description="Missing {}".format(k))
 
 
 def get_entity(entities, id, raiseException=False):
@@ -34,7 +48,6 @@ def get_entity(entities, id, raiseException=False):
 
 def call_route_method(handlers, **kwargs):
     ''' call the appropriate method related to a route and method '''
-    print(handlers, kwargs)
     if request.method in handlers:
         return handlers[request.method](**kwargs)
 
