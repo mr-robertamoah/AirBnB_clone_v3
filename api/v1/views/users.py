@@ -6,7 +6,7 @@ contains implementation of the following routes:
 '''
 
 from api.v1.views import app_views, call_route_method,\
-validate_data, remove_keys, get_entity
+    validate_data, remove_keys, get_entity
 from flask import jsonify, request
 from models import storage
 from models.user import User

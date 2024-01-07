@@ -1,8 +1,12 @@
 #!/usr/bin/python3
-'''Contains the places_reviews view for the API.'''
+'''
+contains implementation to routes regarding reviews and they are:
+    /places/<place_id>/reviews
+    /reviews/<review_id>
+'''
 
 from api.v1.views import app_views, call_route_method,\
-get_entity, validate_data
+    get_entity, validate_data
 from flask import jsonify, request
 from models import storage
 from models.place import Place

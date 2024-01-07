@@ -6,7 +6,7 @@ contains the cities routes:
 '''
 
 from api.v1.views import app_views, call_route_method,\
-get_entity, validate_data
+    get_entity, validate_data
 from flask import jsonify, request
 from models import storage, storage_t
 from models.city import City

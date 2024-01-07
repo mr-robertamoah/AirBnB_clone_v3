@@ -6,7 +6,7 @@ contains implementation of routes relating to places and they are:
 '''
 
 from api.v1.views import app_views, call_route_method,\
-get_entity, validate_data, remove_keys
+    get_entity, validate_data, remove_keys
 from flask import jsonify, request
 from models import storage, storage_t
 from models.amenity import Amenity
@@ -131,7 +131,8 @@ def find_places():
             places.extend(_places)
             places_id.extend(list(map(lambda x: x.id, _places)))
     if keys_status[1]:
-        places.extend(get_places_from_cities(data['cities'], place_ids, ids=True))
+        places.extend(get_places_from_cities(
+                      data['cities'], place_ids, ids=True))
     del places_id
 
     if all([not keys_status[0], not keys_status[1]]) or not data:
