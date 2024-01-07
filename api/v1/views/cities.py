@@ -5,25 +5,33 @@ contains the cities routes:
     /cities/<city_id>
 '''
 
-from api.v2.views import app_views, get_entity, call_route_method
+from api.v1.views import app_views, call_route_method,\
+get_entity, validate_data
 from flask import jsonify, request
 from models import storage, storage_t
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
-from werkzeug.exceptions import NotFound, MethodNotAllowed, BadRequest
+from werkzeug.exceptions import MethodNotAllowed, NotFound, BadRequest
 
 
 @app_views.route('/states/<state_id>/cities', methods=['GET', 'POST'])
 @app_views.route('/cities/<city_id>', methods=['GET', 'DELETE', 'PUT'])
 def handle_cities(state_id=None, city_id=None):
-    ''' handles all routes regarding cities '''
+    ''' handles routes relating to cities '''
+    handlers = {
+        'GET': get_cities,
+        'DELETE': delete_city,
+        'POST': post_city,
+        'PUT': put_city,
+    }
+
     args = {"state_id": state_id, "city_id": city_id}
-    call_route_method(**args)
+    return call_route_method(handlers, **args)
 
 
-def _get(state_id=None, city_id=None):
+def get_cities(state_id=None, city_id=None):
     ''' get city with id or cities in a state '''
     if state_id:
         state = storage.get(State, state_id)
@@ -37,7 +45,7 @@ def _get(state_id=None, city_id=None):
     raise NotFound()
 
 
-def _delete(state_id=None, city_id=None):
+def delete_city(state_id=None, city_id=None):
     ''' deletes city with city_id '''
     city = storage.get(City, city_id)
     if city:
@@ -54,18 +62,14 @@ def _delete(state_id=None, city_id=None):
     raise NotFound()
 
 
-def _post(state_id=None, city_id=None):
+def post_city(state_id=None, city_id=None):
     ''' creates city and adds to state '''
     state = storage.get(State, state_id)
     if state is None:
         raise NotFound()
 
     data = request.get_json()
-    if type(data) is not dict:
-        raise BadRequest(description='Not a JSON')
-
-    if 'name' not in data:
-        raise BadRequest(description='Missing name')
+    validate_data(data)
 
     data['state_id'] = state_id
     city = City(**data)
@@ -73,15 +77,13 @@ def _post(state_id=None, city_id=None):
     return jsonify(city.to_dict()), 201
 
 
-def _put(state_id=None, city_id=None):
-    '''Updates the city with the given id.
-    '''
+def put_city(state_id=None, city_id=None):
+    ''' updates city with city_id '''
     xkeys = ('id', 'state_id', 'created_at', 'updated_at')
     city = storage.get(City, city_id)
     if city:
         data = request.get_json()
-        if type(data) is not dict:
-            raise BadRequest(description='Not a JSON')
+        validate_data(data, includeKey=False)
 
         for key, value in data.items():
             if key not in xkeys:
