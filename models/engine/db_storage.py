@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
 Contains the class DBStorage
+with get and count methods
 """
 
 import models
